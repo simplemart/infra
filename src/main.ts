@@ -9,6 +9,10 @@ export class MyStack extends Stack {
   }
 }
 
+if (!process.env.AWS_PROFILE) {
+  throw new Error('Environment variable AWS_PROFILE is not set. Set it in your shell or in .env');
+}
+
 // for development, use account/region from cdk cli
 const devEnv = {
   account: process.env.CDK_DEFAULT_ACCOUNT,

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# yr - yarn run
+
+# I couldn't find a way to set an environment variable using projen.
+# So here is a small wrapper that does that.
+
+NODE_OPTIONS='--require dotenv/config' yarn run "$@"
