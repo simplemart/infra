@@ -9,6 +9,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   ],
   gitignore: [
     '.env',
+    '!/.idea/runConfigurations',
   ],
 });
 project.synth();
