@@ -6,10 +6,14 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   minNodeVersion: '16.14.0',
   deps: [
     'dotenv',
+    '@pepperize/cdk-organizations',
   ],
   gitignore: [
     '.env',
     '!/.idea/runConfigurations',
   ],
+});
+project.addTask('deploy-all', {
+  exec: 'cdk deploy --all',
 });
 project.synth();
