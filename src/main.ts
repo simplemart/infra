@@ -1,27 +1,49 @@
-import { Organization } from '@pepperize/cdk-organizations';
-import { App, Stack, StackProps } from 'aws-cdk-lib';
+import { Account, Organization, OrganizationalUnit } from '@pepperize/cdk-organizations';
+import { App, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 export class OrganizationStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {
-    super(scope, id, { ...props, env: { ...props.env, region: 'us-east-1' } }); // AWS Organizations API is only available in region us-east-1
+    // AWS Organizations API is only available in region us-east-1
+    super(scope, id, { ...props, env: { ...props.env, region: 'us-east-1' } });
 
     // Create your organization
-    new Organization(this, 'Organization', {});
+    const organization = new Organization(this, 'Organization', {});
 
     // Create an organizational unit (OU)
-    // const organizationUnit = new OrganizationalUnit(this, 'OrganizationalUnit', {
-    //   organizationalUnitName: 'MyFirstOU',
-    //   parent: organization.root,
-    //   removalPolicy: RemovalPolicy.DESTROY, // TODO: delete this when done testing
-    // });
-    //
-    // // Create an account
-    // new Account(this, 'Account', {
-    //   accountName: 'MyFirstAccount',
-    //   email: 'simplemart01+myfirstaccount@gmail.com',
-    //   parent: organizationUnit,
-    // });
+    const workloadsOu = new OrganizationalUnit(this, 'WorkloadsOu', {
+      organizationalUnitName: 'Workloads',
+      parent: organization.root,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+
+    //const workloadsProdOu =
+    new OrganizationalUnit(this, 'WorkloadsProdOu', {
+      organizationalUnitName: 'Prod',
+      parent: workloadsOu,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+
+    //const workloadsSdlcOu =
+    new OrganizationalUnit(this, 'WorkloadsSdlcOu', {
+      organizationalUnitName: 'SDLC',
+      parent: workloadsOu,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+
+    const suspendedOu = new OrganizationalUnit(this, 'SuspendedOu', {
+      organizationalUnitName: 'Suspended',
+      parent: organization.root,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+
+    // Create an account
+    new Account(this, 'WorkloadsSdlcAcc', {
+      accountName: 'MyFirstAccount', // renaming doesn't work
+      email: 'simplemart01+WorkloadsSdlcAcc@gmail.com',
+      parent: suspendedOu,
+      importOnDuplicate: true,
+    });
   }
 }
 
